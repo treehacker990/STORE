@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gateway Admin V8.1</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@500;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- CSS VARIABLES --- */
+        :root {
+            --bg: #050508; --card: rgba(20, 20, 25, 0.6); --nav: rgba(25, 25, 35, 0.8); 
+            --accent: #00e5ff; --text: #ffffff; --muted: #94a3b8; 
+            --border: rgba(255, 255, 255, 0.08); 
+            --green: #00ff9d; --red: #ff0055;
+            --glass: blur(24px) saturate(180%);
+            --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        /* --- THEMES --- */
+        [data-theme="cyberpunk"] { --bg:#050508; --accent:#00e5ff; }
+        [data-theme="matrix"] { --bg:#000000; --card:rgba(0, 20, 0, 0.8); --nav:rgba(0, 30, 0, 0.9); --accent:#00ff00; --green:#00ff00; --red:#008800; }
+        [data-theme="blood"] { --bg:#0f0202; --card:rgba(30, 5, 5, 0.6); --nav:rgba(40, 5, 5, 0.8); --accent:#ff0033; --green:#ff3333; --red:#ff0033; }
+        [data-theme="gold"] { --bg:#0a0800; --card:rgba(30, 25, 10, 0.6); --nav:rgba(40, 35, 10, 0.8); --accent:#ffd700; --green:#ffeb3b; --red:#ff4500; color:#fff; }
+        [data-theme="ice"] { --bg:#00080a; --card:rgba(10, 30, 40, 0.6); --nav:rgba(10, 40, 50, 0.8); --accent:#00ffff; --green:#a0ffff; --red:#ff0055; }
+        [data-theme="nature"] { --bg:#051005; --card:rgba(10, 30, 10, 0.6); --nav:rgba(15, 40, 15, 0.8); --accent:#00ff44; --green:#55ff55; --red:#ff5555; }
+        
+        /* Anime Themes */
+        [data-theme="itachi"] { --bg:#050000; --card:rgba(20, 0, 0, 0.7); --nav:rgba(30, 0, 0, 0.9); --accent:#ff0000; }
+        [data-theme="gojo"] { --bg:#0a0014; --card:rgba(20, 0, 40, 0.6); --nav:rgba(30, 10, 50, 0.8); --accent:#c400ff; --green:#d633ff; --red:#ff0066; }
+        [data-theme="luffy"] { --bg:#1a1a1a; --card:rgba(40, 40, 40, 0.6); --nav:rgba(50, 50, 50, 0.8); --accent:#ffffff; --green:#dddddd; --red:#ff3333; }
+        [data-theme="demon"] { --bg:#00080a; --card:rgba(0, 20, 30, 0.6); --nav:rgba(0, 30, 40, 0.8); --accent:#00ffcc; }
+
+        /* --- GLOBAL RESETS --- */
+        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; user-select: none; }
+        body { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 110px; overflow-x: hidden; transition: background 0.4s ease; }
+        
+        #bgCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; pointer-events: none; }
+        #themeOverlay { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100vw; height: 100vh; z-index: -1; pointer-events: none; display: flex; align-items: center; justify-content: center; opacity: 0.3; overflow: hidden; }
+
+        /* --- HEADER --- */
+        header { 
+            position: sticky; top: 0; z-index: 50; 
+            background: rgba(0,0,0,0.2); backdrop-filter: var(--glass);
+            border-bottom: 1px solid var(--border); padding: 15px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .brand { font-weight: 800; font-size: 1.1rem; display: flex; align-items: center; gap: 10px; letter-spacing: -0.5px; }
+        .brand i { color: var(--accent); filter: drop-shadow(0 0 8px var(--accent)); transition: 0.3s; }
+        .icon-btn { 
+            width: 38px; height: 38px; border-radius: 12px; 
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--muted);
+            display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;
+        }
+        .icon-btn:active { transform: scale(0.95); background: var(--accent); color: #000; }
+
+        /* --- LAYOUT --- */
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .hidden { display: none !important; }
+        .fade-in { animation: fadeIn 0.4s ease forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- CONTROLS --- */
+        .controls { display: flex; gap: 10px; margin-bottom: 15px; }
+        .search { position: relative; flex: 1; }
+        .search i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 0.8rem; }
+        .input-std { 
+            width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--border); 
+            padding: 12px 12px 12px 40px; color: var(--text); border-radius: 12px; 
+            font-family: 'Inter', sans-serif; font-size: 0.9rem; backdrop-filter: blur(5px); transition: 0.3s;
+        }
+        .input-std:focus { border-color: var(--accent); background: rgba(0,0,0,0.3); box-shadow: 0 0 20px rgba(0,0,0,0.2); }
+        .btn-main { 
+            background: var(--accent); color: #000; border: none; padding: 0 20px; 
+            border-radius: 12px; font-weight: 700; cursor: pointer; 
+            display: flex; align-items: center; gap: 8px; white-space: nowrap; box-shadow: var(--shadow); transition: 0.2s;
+        }
+        
+        /* --- CHIPS --- */
+        .chips { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
+        .chip { padding: 8px 18px; border-radius: 20px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); font-size: 0.75rem; font-weight: 600; color: var(--muted); cursor: pointer; transition: 0.2s; white-space: nowrap; }
+        .chip.active { background: var(--accent); color: #000; border-color: var(--accent); box-shadow: 0 0 15px var(--accent); }
+
+        /* --- CARDS --- */
+        .item-card { 
+            background: var(--card); border: 1px solid var(--border); 
+            border-radius: 24px; padding: 20px; margin-bottom: 12px; 
+            display: flex; flex-direction: column; gap: 12px;
+            backdrop-filter: var(--glass); 
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+            position: relative; overflow: hidden;
+        }
+        .item-card.active-card::before { content:''; position: absolute; top:0; left:0; width:4px; height:100%; background: var(--green); box-shadow: 2px 0 15px var(--green); }
+        .item-card.banned-card::before { content:''; position: absolute; top:0; left:0; width:4px; height:100%; background: var(--red); box-shadow: 2px 0 15px var(--red); }
+        
+        .row-top { display: flex; justify-content: space-between; align-items: center; padding-left: 8px; }
+        .mono-text { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--text); font-size: 0.95rem; word-break: break-all; opacity: 0.95; }
+        .meta-row { border-top: 1px solid var(--border); padding: 12px 0 0 8px; display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--muted); align-items: center; }
+        .badge { font-weight: 800; text-transform: uppercase; padding: 4px 10px; border-radius: 8px; font-size: 0.6rem; letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 5px; }
+        .badge.active { background: rgba(0, 255, 157, 0.1); color: var(--green); border: 1px solid rgba(0, 255, 157, 0.2); }
+        .badge.banned { background: rgba(255, 0, 85, 0.1); color: var(--red); border: 1px solid rgba(255, 0, 85, 0.2); }
+        
+        .device-info { display: flex; align-items: center; gap: 15px; }
+        .device-icon { width: 42px; height: 42px; border-radius: 14px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: var(--muted); border: 1px solid var(--border); }
+        .active-card .device-icon { color: var(--green); border-color: rgba(0,255,157,0.3); box-shadow: 0 0 15px rgba(0,255,157,0.1); }
+        .banned-card .device-icon { color: var(--red); border-color: rgba(255,0,85,0.3); box-shadow: 0 0 15px rgba(255,0,85,0.1); }
+        
+        .info-pill { 
+            background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 8px; border: 1px solid var(--border); 
+            display: inline-flex; align-items: center; gap: 6px; font-family: 'JetBrains Mono', monospace; color: var(--muted);
+            font-size: 0.7rem; margin-top: 5px;
+        }
+
+        /* --- SWITCH --- */
+        .switch { position: relative; width: 50px; height: 28px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #222; border-radius: 30px; transition: .3s; border: 1px solid var(--border); }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background: #666; border-radius: 50%; transition: .3s; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+        input:checked + .slider { background: rgba(255, 0, 85, 0.2); border-color: var(--red); }
+        input:checked + .slider:before { transform: translateX(22px); background: var(--red); box-shadow: 0 0 10px var(--red); }
+        input:not(:checked) + .slider { background: rgba(0, 255, 157, 0.2); border-color: var(--green); }
+        input:not(:checked) + .slider:before { background: var(--green); box-shadow: 0 0 10px var(--green); }
+
+        /* --- NAV BAR --- */
+        .nav-fixed { position: fixed; bottom: 25px; left: 0; right: 0; display: flex; justify-content: center; z-index: 99; pointer-events: none; }
+        .nav-inner { 
+            background: var(--nav); border: 1px solid var(--border); padding: 0 10px; height: 70px; border-radius: 24px; width: 90%; max-width: 400px; 
+            display: flex; justify-content: space-around; align-items: center; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6); backdrop-filter: var(--glass); pointer-events: auto; 
+        }
+        .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--muted); font-size: 1.2rem; transition: 0.3s; cursor: pointer; height: 100%; border-radius: 12px; }
+        .nav-btn:hover { color: #fff; transform: translateY(-2px); }
+        .nav-btn.active { color: var(--accent); transform: translateY(-3px); text-shadow: 0 0 15px var(--accent); }
+        .nav-lbl { font-size: 0.65rem; margin-top: 4px; font-weight: 700; letter-spacing: 0.5px; opacity: 0.9; }
+
+        /* --- SETUP / TOAST / MODALS --- */
+        .setup-box { text-align: center; padding: 40px 25px; border: 1px solid var(--border); border-radius: 24px; background: var(--card); margin-top: 40px; backdrop-filter: blur(20px); box-shadow: var(--shadow); animation: fadeIn 0.5s ease; }
+        .btn-block { width: 100%; padding: 15px; background: var(--accent); color: #000; border: none; border-radius: 16px; font-weight: 800; margin-top: 15px; cursor: pointer; letter-spacing: 0.5px; font-size: 0.9rem; transition: 0.2s; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .btn-block:active { transform: scale(0.98); }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 200; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); transition: 0.3s; opacity: 0; pointer-events: none; }
+        .modal-overlay.open { opacity: 1; pointer-events: auto; }
+        .modal-content { background: #111; width: 90%; max-width: 340px; padding: 30px; border-radius: 24px; border: 1px solid var(--border); box-shadow: 0 0 50px rgba(0,0,0,0.8); transform: scale(0.9); transition: 0.3s; }
+        .modal-overlay.open .modal-content { transform: scale(1); }
+        .inp-group { margin-bottom: 20px; text-align: left; }
+        .inp-label { display: block; color: var(--muted); font-size: 0.7rem; font-weight: 800; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: var(--nav); border: 1px solid var(--accent); color: var(--text); padding: 12px 25px; border-radius: 50px; z-index: 300; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; align-items: center; gap: 10px; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.5); font-size: 0.85rem; white-space: nowrap; }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+
+        /* --- THEME GRID --- */
+        .theme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-height: 300px; overflow-y: auto; }
+        .theme-btn { 
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border); padding: 15px; 
+            border-radius: 12px; text-align: center; color: var(--muted); font-weight: 700; cursor: pointer; transition: 0.2s;
+        }
+        .theme-btn:hover { background: var(--accent); color: #000; }
+        
+        /* --- DPMODS PANEL --- */
+        .dp-card { background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%); border: 1px solid var(--border); border-radius: 20px; padding: 25px; text-align: center; margin-top: 20px; position: relative; overflow: hidden; }
+        .dp-card::after { content: ''; position: absolute; top:0; left:0; width:100%; height:4px; background: linear-gradient(90deg, transparent, var(--accent), transparent); }
+    </style>
+</head>
+<body>
+
+    <canvas id="bgCanvas"></canvas>
+    
+    <header>
+        <div class="brand"><i class="fas fa-cube"></i> <span id="brandName">...</span></div>
+        <div style="display:flex; gap:10px">
+            <div class="icon-btn" onclick="openThemeModal()"><i class="fas fa-palette"></i></div>
+            <div class="icon-btn" onclick="appInit(true)"><i class="fas fa-sync-alt"></i></div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div id="viewLoader" style="text-align: center; padding: 100px 0;">
+            <i class="fas fa-circle-notch fa-spin" style="font-size: 2.5rem; color: var(--accent);"></i>
+            <p style="color: var(--muted); margin-top: 20px; font-weight: 600; letter-spacing: 2px; font-size: 0.8rem;">ESTABLISHING UPLINK...</p>
+        </div>
+
+        <div id="viewSetup" class="hidden setup-box">
+            <div style="width: 60px; height: 60px; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; border: 1px solid var(--border);">
+                <i class="fas fa-database" style="font-size: 1.5rem; color: var(--accent);"></i>
+            </div>
+            <h2 style="margin: 0 0 10px 0;">Connect Database</h2>
+            <div class="inp-group"><label class="inp-label">FIREBASE URL</label><input type="text" class="input-std" id="inputDbUrl" placeholder="https://..." style="padding-left: 15px;"></div>
+            <button class="btn-block" onclick="saveUrlAndConnect()">ESTABLISH CONNECTION</button>
+        </div>
+
+        <div id="viewDashboard" class="hidden fade-in">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:20px;">
+                <div class="item-card" style="align-items:center; padding:15px; margin:0; border-color: rgba(0,229,255,0.2);">
+                    <span style="font-size:1.8rem; font-weight:800; color:var(--accent);" id="statKeys">0</span>
+                    <span style="font-size:0.65rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing: 1px;">Valid Keys</span>
+                </div>
+                <div class="item-card" style="align-items:center; padding:15px; margin:0; border-color: rgba(0,255,157,0.2);">
+                    <span style="font-size:1.8rem; font-weight:800; color:var(--green);" id="statDevs">0</span>
+                    <span style="font-size:0.65rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing: 1px;">Devices</span>
+                </div>
+            </div>
+
+            <div id="tabKeys">
+                <div class="controls">
+                    <div class="search"><i class="fas fa-search"></i><input type="text" class="input-std" id="searchKeys" placeholder="Search Keys..." onkeyup="renderKeys()"></div>
+                    <button class="btn-main" onclick="openModal('modalKey')"><i class="fas fa-plus"></i> NEW</button>
+                </div>
+                <div id="listKeys"></div>
+            </div>
+
+            <div id="tabDevices" class="hidden">
+                <div class="controls">
+                    <div class="search"><i class="fas fa-search"></i><input type="text" class="input-std" id="searchDevs" placeholder="Search Device ID..." onkeyup="renderDevices()"></div>
+                </div>
+                <div class="chips">
+                    <div class="chip active" onclick="setDevFilter('all', this)">All Devices</div>
+                    <div class="chip" onclick="setDevFilter('allowed', this)">Allowed Only</div>
+                    <div class="chip" onclick="setDevFilter('banned', this)">Banned Only</div>
+                </div>
+                <div id="listDevices"></div>
+            </div>
+
+            <div id="tabConfig" class="hidden">
+                <h3 style="margin-bottom:20px; color:var(--text); font-weight:800; display:flex; align-items:center; gap:10px;">
+                    <i class="fas fa-cogs" style="color:var(--accent)"></i> System Config
+                </h3>
+                
+                <div class="item-card">
+                    <h4 style="margin:0 0 15px 0; color:var(--accent); font-size:0.85rem; border-bottom:1px solid var(--border); padding-bottom:10px;">APP SETTINGS</h4>
+                    <div class="inp-group"><label class="inp-label">APP TITLE</label><input type="text" class="input-std" id="confTitle" style="padding-left:15px"></div>
+                    <div class="inp-group"><label class="inp-label">SUBTITLE</label><input type="text" class="input-std" id="confSub" style="padding-left:15px"></div>
+                    <div class="inp-group"><label class="inp-label">APP VERSION</label><input type="number" class="input-std" id="confVer" style="padding-left:15px" placeholder="1"></div>
+                    <div class="inp-group"><label class="inp-label">UPDATE URL</label><input type="text" class="input-std" id="confUpdateUrl" style="padding-left:15px" placeholder="https://..."></div>
+                    <div class="inp-group"><label class="inp-label">ADMIN CONTACT URL</label><input type="text" class="input-std" id="confUrl" style="padding-left:15px"></div>
+                </div>
+
+                <div class="item-card">
+                    <h4 style="margin:0 0 15px 0; color:var(--accent); font-size:0.85rem; border-bottom:1px solid var(--border); padding-bottom:10px;">UI CUSTOMIZATION</h4>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                        <div class="inp-group"><label class="inp-label">BTN ADMIN</label><input type="text" class="input-std" id="confBtnAdmin" style="padding-left:15px"></div>
+                        <div class="inp-group"><label class="inp-label">BTN KEY</label><input type="text" class="input-std" id="confBtnKey" style="padding-left:15px"></div>
+                    </div>
+                    <div class="inp-group"><label class="inp-label">BTN LOGIN</label><input type="text" class="input-std" id="confBtnLogin" style="padding-left:15px"></div>
+                    <div class="inp-group"><label class="inp-label">INPUT HINT</label><input type="text" class="input-std" id="confHint" style="padding-left:15px"></div>
+                    <div class="inp-group"><label class="inp-label">KEY DURATION (HOURS)</label><input type="number" class="input-std" id="confDuration" style="padding-left:1
