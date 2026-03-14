@@ -1,234 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>HELPER MODS INJECTOR</title>
+<html>
+<body style="background:black;color:white;text-align:center">
 
-<style>
+<h2>Devil Base64 Converter</h2>
 
-body{
-margin:0;
-font-family:Arial;
-background:black;
-color:white;
-text-align:center;
-overflow:hidden;
-}
+<input type="file" id="imgInput">
 
-/* MATRIX BACKGROUND */
-
-canvas{
-position:fixed;
-top:0;
-left:0;
-z-index:-1;
-}
-
-/* MAIN CONTAINER */
-
-.container{
-margin-top:80px;
-padding:20px;
-}
-
-/* TITLE */
-
-.title{
-font-size:50px;
-color:#00ffcc;
-text-shadow:0 0 20px #00ffcc,0 0 40px #00ffcc;
-animation:glow 2s infinite alternate;
-}
-
-@keyframes glow{
-from{ text-shadow:0 0 10px #00ffcc;}
-to{ text-shadow:0 0 40px #00ffcc;}
-}
-
-.subtitle{
-font-size:20px;
-color:#00ff88;
-margin-bottom:40px;
-}
-
-/* FEATURES */
-
-.features{
-line-height:35px;
-font-size:18px;
-margin-bottom:40px;
-}
-
-/* PRICE CARDS */
-
-.price-container{
-display:flex;
-justify-content:center;
-flex-wrap:wrap;
-gap:20px;
-}
-
-.price-card{
-background:#0a0a0a;
-border:2px solid #00ffcc;
-padding:20px;
-width:160px;
-border-radius:10px;
-box-shadow:0 0 20px #00ffcc;
-}
-
-.price-card h3{
-color:#00ffcc;
-}
-
-.price{
-font-size:22px;
-color:#00ff88;
-}
-
-/* BUTTONS */
-
-.btn{
-display:inline-block;
-margin:20px;
-padding:15px 30px;
-font-size:18px;
-border-radius:8px;
-text-decoration:none;
-color:white;
-transition:0.3s;
-}
-
-.telegram{
-background:#0088cc;
-box-shadow:0 0 15px #0088cc;
-}
-
-.buy{
-background:#00aa44;
-box-shadow:0 0 15px #00aa44;
-}
-
-.btn:hover{
-transform:scale(1.1);
-}
-
-/* FOOTER */
-
-.footer{
-margin-top:50px;
-color:#888;
-}
-
-</style>
-</head>
-
-<body>
-
-<canvas id="matrix"></canvas>
-
-<div class="container">
-
-<div class="title">HELPER MODS</div>
-
-<div class="subtitle">
-Injector • Root • VPhoneOS Premium
-</div>
-
-<div class="features">
-⚡ Ultra Fast Injection<br>
-🛡 Anti Ban Protection<br>
-📱 Root Supported<br>
-🔥 VPhoneOS Premium Support<br>
-🚀 Smooth Gameplay
-</div>
-
-<div class="price-container">
-
-<div class="price-card">
-<h3>1 DAY</h3>
-<div class="price">₹50</div>
-</div>
-
-<div class="price-card">
-<h3>7 DAYS</h3>
-<div class="price">₹150</div>
-</div>
-
-<div class="price-card">
-<h3>30 DAYS</h3>
-<div class="price">₹400</div>
-</div>
-
-<div class="price-card">
-<h3>LIFETIME</h3>
-<div class="price">₹999</div>
-</div>
-
-</div>
-
-<br>
-
-<a href="https://t.me/+fzRDO3ib30s3N2Y9" class="btn telegram">
-Join Telegram
-</a>
-
-<a href="tg://openmessage?user_id=7695425512" class="btn buy">
-Buy Now
-</a>
-
-<div class="footer">
-© 2026 HELPER MODS TEAM
-</div>
-
-</div>
+<p>Base64 Output:</p>
+<textarea id="output" style="width:90%;height:300px;"></textarea>
 
 <script>
+document.getElementById("imgInput").addEventListener("change", function(){
+    const file = this.files[0];
+    const reader = new FileReader();
 
-/* MATRIX EFFECT */
+    reader.onload = function(e){
+        document.getElementById("output").value = e.target.result;
+    }
 
-var canvas = document.getElementById("matrix");
-var ctx = canvas.getContext("2d");
-
-canvas.height = window.innerHeight;
-canvas.width = window.innerWidth;
-
-var letters = "HELPERMODS0123456789";
-letters = letters.split("");
-
-var fontSize = 14;
-var columns = canvas.width / fontSize;
-
-var drops = [];
-
-for(var x = 0; x < columns; x++)
-drops[x] = 1;
-
-function draw(){
-
-ctx.fillStyle = "rgba(0,0,0,0.05)";
-ctx.fillRect(0,0,canvas.width,canvas.height);
-
-ctx.fillStyle = "#00ffcc";
-ctx.font = fontSize + "px monospace";
-
-for(var i = 0; i < drops.length; i++){
-
-var text = letters[Math.floor(Math.random()*letters.length)];
-
-ctx.fillText(text,i*fontSize,drops[i]*fontSize);
-
-if(drops[i]*fontSize > canvas.height && Math.random() > 0.975)
-drops[i] = 0;
-
-drops[i]++;
-
-}
-
-}
-
-setInterval(draw,33);
-
+    reader.readAsDataURL(file);
+});
 </script>
 
 </body>
