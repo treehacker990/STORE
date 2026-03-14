@@ -1,517 +1,235 @@
-html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>DEVIL_MODS — Cyber Profile</title>
-
-<!-- Fonts + Icons -->
-<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<meta charset="UTF-8">
+<title>HELPER MODS INJECTOR</title>
 
 <style>
-  :root{
-    --neon: #00ff5a;
-    --neon-2: #00cc66;
-    --bg-1: #000;
-    --panel-bg: rgba(0,0,0,0.75);
-    --glass: rgba(255,255,255,0.02);
-    --maxWidth:1100px;
-    --ui-pad:18px;
-    --radius:12px;
-  }
-  *{box-sizing:border-box}
-  html,body{height:100%; margin:0; font-family:Inter, "Share Tech Mono", monospace; background:#000; color:var(--neon); -webkit-font-smoothing:antialiased}
-  a{color:inherit}
 
-  /* Matrix canvas sits behind everything */
-  #matrix {
-    position:fixed; inset:0; width:100%; height:100%; z-index:-2; display:block;
-    background: radial-gradient(1200px 400px at 10% 10%, rgba(0,255,76,0.02), transparent 6%);
-  }
+body{
+margin:0;
+font-family:Arial;
+background:black;
+color:white;
+text-align:center;
+overflow:hidden;
+}
 
-  /* subtle overlay so text is readable */
-  .overlay {
-    position:fixed; inset:0; z-index:-1;
-    background: linear-gradient(180deg, rgba(0,0,0,0.15), rgba(0,0,0,0.5));
-  }
+/* MATRIX BACKGROUND */
 
-  .page {
-    width:100%;
-    max-width:var(--maxWidth);
-    margin:28px auto;
-    padding: var(--ui-pad);
-  }
+canvas{
+position:fixed;
+top:0;
+left:0;
+z-index:-1;
+}
 
-  /* Header (avatar + name + meta) */
-  header.header {
-    display:flex;
-    gap:16px;
-    align-items:center;
-    padding:14px;
-    border-radius:var(--radius);
-    background: linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.12));
-    border:1px solid rgba(0,255,76,0.06);
-    box-shadow: 0 12px 40px rgba(0,255,76,0.03);
-  }
+/* MAIN CONTAINER */
 
-  /* avatar - use <img> with fixed dimensions to avoid layout shifts */
-  .avatar-wrap{
-    width:140px; height:140px; flex:0 0 140px;
-    display:block; border-radius:50%;
-    border:4px solid rgba(0,255,76,0.12); overflow:hidden;
-    background: linear-gradient(180deg, rgba(0,0,0,0.2), rgba(0,0,0,0.1));
-    box-shadow: 0 8px 30px rgba(0,255,76,0.06);
-  }
-  .avatar-wrap img{
-    width:100%; height:100%; object-fit:cover; display:block; vertical-align:middle;
-  }
+.container{
+margin-top:80px;
+padding:20px;
+}
 
-  .head-info { flex:1; min-width:0 }
-  .brand { font-family:"Share Tech Mono", monospace; font-size:28px; letter-spacing:3px; margin:4px 0; text-shadow:0 0 10px rgba(0,255,76,0.15) }
-  .subtitle { color: rgba(0,255,76,0.7); font-size:13px; margin-bottom:8px }
+/* TITLE */
 
-  .meta {
-    display:flex; gap:8px; flex-wrap:wrap; align-items:center; color:rgba(0,255,76,0.65); font-size:13px;
-  }
-  .meta .pill {
-    padding:6px 10px; border-radius:10px; background: rgba(0,0,0,0.2); border:1px solid rgba(0,255,76,0.05)
-  }
+.title{
+font-size:50px;
+color:#00ffcc;
+text-shadow:0 0 20px #00ffcc,0 0 40px #00ffcc;
+animation:glow 2s infinite alternate;
+}
 
-  /* Panel: about box should be full width of the content and look like a code box */
-  .panel {
-    margin-top:18px;
-    background: linear-gradient(180deg, rgba(0,0,0,0.7), rgba(0,0,0,0.55));
-    border-radius:12px;
-    border:1px solid rgba(0,255,76,0.12);
-    padding:0;
-    overflow:hidden;
-  }
+@keyframes glow{
+from{ text-shadow:0 0 10px #00ffcc;}
+to{ text-shadow:0 0 40px #00ffcc;}
+}
 
-  /* About area is a code-like full-width box that can scroll if very long */
-  .about-wrap {
-    width:100%;
-    padding:20px;
-    background: linear-gradient(180deg, rgba(0,0,0,0.28), rgba(0,0,0,0.18));
-    border-bottom: 1px dashed rgba(0,255,76,0.06);
-  }
-  .about-title{
-    font-family:"Share Tech Mono", monospace;
-    font-size:12px; color:var(--neon); letter-spacing:2px; margin:0 0 10px;
-  }
-  .about-box{
-    width:100%;
-    max-height:44vh; /* responsive - about takes visible portion, scrolls if longer */
-    overflow:auto;
-    padding:14px;
-    border-radius:8px;
-    background: rgba(0,0,0,0.6);
-    border:1px solid rgba(0,255,76,0.04);
-    color:var(--neon);
-    line-height:1.55;
-    font-size:15px;
-    white-space:pre-wrap;
-  }
-  .about-box::-webkit-scrollbar{width:8px}
-  .about-box::-webkit-scrollbar-thumb{background:rgba(0,255,76,0.12); border-radius:6px}
+.subtitle{
+font-size:20px;
+color:#00ff88;
+margin-bottom:40px;
+}
 
-  /* actions area under about: social buttons stacked + small utilities */
-  .actions {
-    display:flex; gap:18px; align-items:flex-start; padding:18px;
-    justify-content:space-between; flex-wrap:wrap;
-  }
+/* FEATURES */
 
-  .social-list {
-    display:flex; flex-direction:column; gap:12px; min-width:220px;
-  }
-  .social-btn {
-    display:inline-flex; gap:10px; align-items:center;
-    padding:12px 14px; border-radius:10px; text-decoration:none; color:#000;
-    background: linear-gradient(90deg,var(--neon), var(--neon-2));
-    font-weight:700; box-shadow:0 10px 40px rgba(0,255,76,0.12);
-    transition: transform .18s ease, box-shadow .18s ease;
-  }
-  .social-btn i{ font-size:18px }
-  .social-btn:active{ transform:translateY(2px) }
+.features{
+line-height:35px;
+font-size:18px;
+margin-bottom:40px;
+}
 
-  /* utility buttons */
-  .utils { display:flex; gap:10px; align-items:center; }
-  .util-btn {
-    padding:8px 12px; border-radius:8px; background:transparent;
-    color:var(--neon); border:1px solid rgba(0,255,76,0.08); cursor:pointer;
-  }
+/* PRICE CARDS */
 
-  /* skills list in sequence */
-  .skills {
-    flex:1 1 420px;
-    display:flex; flex-direction:column; gap:10px; padding:18px;
-    max-width:760px;
-  }
-  .skill-row {
-    display:flex; gap:14px; align-items:center; padding:12px; border-radius:10px;
-    border:1px solid rgba(0,255,76,0.06);
-    background: linear-gradient(180deg, rgba(0,0,0,0.28), rgba(0,0,0,0.12));
-    transform:translateY(18px); opacity:0; transition: all 420ms cubic-bezier(.2,.9,.2,1);
-  }
-  .skill-row.show { transform:none; opacity:1 }
-  .skill-icon {
-    width:56px; height:56px; border-radius:10px; display:flex; align-items:center; justify-content:center;
-    font-size:20px; color:var(--neon); background: linear-gradient(180deg, rgba(0,255,76,0.05), rgba(0,255,76,0.02));
-    border:1px solid rgba(0,255,76,0.04);
-  }
-  .skill-text { font-weight:600; letter-spacing:0.8px; color:var(--neon) }
+.price-container{
+display:flex;
+justify-content:center;
+flex-wrap:wrap;
+gap:20px;
+}
 
-  /* Footer + back to top */
-  footer { text-align:center; padding:18px; color:rgba(0,255,76,0.6); font-size:13px }
-  .top-btn {
-    position:fixed; right:18px; bottom:18px; z-index:9999; border-radius:10px; padding:12px; cursor:pointer;
-    background:linear-gradient(180deg,var(--neon), var(--neon-2)); color:#000; border:none; box-shadow:0 10px 40px rgba(0,255,76,0.12)
-  }
+.price-card{
+background:#0a0a0a;
+border:2px solid #00ffcc;
+padding:20px;
+width:160px;
+border-radius:10px;
+box-shadow:0 0 20px #00ffcc;
+}
 
-  /* responsiveness */
-  @media (max-width:900px){
-    header.header { flex-direction:row; gap:12px }
-    .page { padding:12px }
-    .avatar-wrap{ width:110px; height:110px; flex:0 0 110px }
-    .about-box{ max-height:36vh }
-  }
-  @media (max-width:640px){
-    header.header{ flex-direction:column; align-items:center; text-align:center }
-    .actions{ flex-direction:column; gap:14px; align-items:stretch }
-    .skills{ order:3 }
-    .social-list { width:100% }
-    .about-box{ max-height:40vh }
-  }
+.price-card h3{
+color:#00ffcc;
+}
+
+.price{
+font-size:22px;
+color:#00ff88;
+}
+
+/* BUTTONS */
+
+.btn{
+display:inline-block;
+margin:20px;
+padding:15px 30px;
+font-size:18px;
+border-radius:8px;
+text-decoration:none;
+color:white;
+transition:0.3s;
+}
+
+.telegram{
+background:#0088cc;
+box-shadow:0 0 15px #0088cc;
+}
+
+.buy{
+background:#00aa44;
+box-shadow:0 0 15px #00aa44;
+}
+
+.btn:hover{
+transform:scale(1.1);
+}
+
+/* FOOTER */
+
+.footer{
+margin-top:50px;
+color:#888;
+}
+
 </style>
 </head>
+
 <body>
 
-<!-- matrix canvas -->
 <canvas id="matrix"></canvas>
-<div class="overlay" aria-hidden="true"></div>
 
-<div class="page" role="main" aria-labelledby="profileName">
+<div class="container">
 
-  <!-- header -->
-  <header class="header" role="banner">
-    <div class="avatar-wrap" aria-hidden="true">
-      <!-- Replace REPLACE_AVATAR_URL with your avatar image URL -->
-      <img id="avatarImg" src="https://i.postimg.cc/h49K6mtY/file-000000001f647206891ea3c833213bc2.png" alt="DEVIL avatar" loading="lazy" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22150%22 height=%22150%22><rect width=%22150%22 height=%22150%22 fill=%23000/><text x=%2275%22 y=%2278%22 font-size=%2230%22 font-family=%27Share Tech Mono%27 fill=%2300ff5a%27 text-anchor=%22middle%22>PI</text></svg>'">
-    </div>
+<div class="title">HELPER MODS</div>
 
-    <div class="head-info">
-      <div id="profileName" class="brand">DEVIL_MODS</div>
-      <div class="subtitle">Coder • App Developer • FF panel &amp; mod maker</div>
-
-      <div class="meta" aria-hidden="true">
-        <div class="pill">Age: 18</div>
-        <div class="pill">From: PUNJAB</div>
-        <div class="pill">Email: scamfor01@gmail.com</div>
-        <div class="pill">TG: @DEVIL_LOST</div>
-      </div>
-    </div>
-  </header>
-
-  <!-- panel with about box -->
-  <section class="panel" aria-labelledby="aboutHeading">
-    <div class="about-wrap">
-      <div class="about-title" id="aboutHeading">/ ABOUT ME</div>
-
-      <!-- About box fills width of panel and has a max-height so it doesn't take whole screen -->
-      <div id="aboutBox" class="about-box" tabindex="0">
-my all about in the below. in this my about, skills, knowledge all mentioned. real this:
-Hello — I'm DEVIL (18) from PUNJAB. I'm passionate about building apps, bots, and FF panels.
-I study cybersecurity, ethical hacking and mobile security. I create projects, tutorials,
-and tools. I enjoy learning and sharing knowledge with community.
-
-Work:
-- Coding &amp; App Development
-- FF Panel Making &amp; Mod Menu Development
-- Telegram Bots &amp; Tools
-
-Contact:
-Email: scamfor01@gmail.com
-Telegram: @DEVIL_LOST
-Instagram: @ITS__JASHANPREET_
-*/
-      </div>
-    </div>
-
-    <!-- actions: social + utilities + quick info -->
-    <div class="actions">
-      <nav class="social-list" aria-label="social links">
-        <!-- Buttons attempt to open Chrome on Android using Intent; desktop will open normal link -->
-        <a class="social-btn" href="intent://t.me/DEVIL_LOST/#Intent;scheme=https;package=com.android.chrome;end" data-href="https://t.me/+YIrH-jdTQoplNDU1" title="Open Telegram in Chrome">
-          <i class="fab fa-telegram"></i> Telegram
-        </a>
-
-        <a class="social-btn" href="intent://t.me/+bdierAbhkyA2NTc1#Intent;scheme=https;package=com.android.chrome;end" data-href="https://t.me/+bdierAbhkyA2NTc1" title="Open Telegram in Chrome">
-          <i class="fab fa-telegram"></i> Telegram channel
-        </a>
-
-        <!-- Replace REPLACE_WHATSAPP_NUMBER with your number, e.g. 919876543210 -->
-        <a class="social-btn" href="intent://wa.me/37373736#Intent;scheme=https;package=com.android.chrome;end" data-href="https://wa.me/37373737" title="Open WhatsApp in Chrome">
-          <i class="fab fa-whatsapp"></i> WhatsApp
-        </a>
-
-        <a class="social-btn" href="intent://youtube.com/@helper_mods?si=XsU58SPquOFLrTHn#Intent;scheme=https;package=com.android.chrome;end" data-href="https://youtube.com/@helper_mods?si=XsU58SPquOFLrTHn" title="Open YouTube in Chrome">
-          <i class="fab fa-youtube"></i> YouTube
-        </a>
-      </nav>
-
-      <div style="display:flex; gap:12px; align-items:flex-start; flex-direction:column;">
-        <div style="display:flex; gap:8px; align-items:center;">
-          <button class="util-btn" id="copyEmail" title="Copy email to clipboard"><i class="fa fa-copy"></i> Copy Email</button>
-          <button class="util-btn" id="downloadVcard" title="Download vCard"><i class="fa fa-download"></i> Download vCard</button>
-        </div>
-
-        <div style="border:1px solid rgba(0,255,76,0.04); padding:12px; border-radius:8px; color:rgba(0,255,76,0.8); background:rgba(0,0,0,0.12); font-size:13px;">
-          <div style="font-weight:700; margin-bottom:6px">QUICK INFO</div>
-          <div>Birthday: 20 SEPTEMBER<br>Work: Coding, App Developer, FF Panel Making<br>IG: @ITS__JASHANPREET_</div>
-        </div>
-      </div>
-
-    </div> <!-- actions -->
-  </section>
-
-  <!-- Skills -->
-  <section aria-labelledby="skillsHeading" style="margin-top:18px">
-    <div style="font-family:Share Tech Mono, monospace; font-size:13px; color:var(--neon); margin-bottom:12px" id="skillsHeading">/ SKILLS &amp; KNOWLEDGE</div>
-    <div class="skills" id="skillsList">
-      <!-- 1 -->
-      <div class="skill-row" data-order="1">
-        <div class="skill-icon"><i class="fa-solid fa-code"></i></div>
-        <div class="skill-text">Coading</div>
-      </div>
-      <!-- 2 App -->
-      <div class="skill-row" data-order="2">
-        <div class="skill-icon"><i class="fa-solid fa-mobile-screen-button"></i></div>
-        <div class="skill-text">App Developer</div>
-      </div>
-      <!-- 3 Web -->
-      <div class="skill-row" data-order="3">
-        <div class="skill-icon"><i class="fa-solid fa-laptop-code"></i></div>
-        <div class="skill-text">Web Developer</div>
-      </div>
-      <!-- 4 FF Panel -->
-      <div class="skill-row" data-order="4">
-        <div class="skill-icon"><i class="fa-solid fa-layer-group"></i></div>
-        <div class="skill-text">FF Panel Making</div>
-      </div>
-      <!-- 5 FF Mod -->
-      <div class="skill-row" data-order="5">
-        <div class="skill-icon"><i class="fa-solid fa-gamepad"></i></div>
-        <div class="skill-text">FF Mod Menu Making</div>
-      </div>
-      <!-- 6 Termux -->
-      <div class="skill-row" data-order="6">
-        <div class="skill-icon"><i class="fa-solid fa-terminal"></i></div>
-        <div class="skill-text">Termux</div>
-      </div>
-      <!-- 7 Cyber -->
-      <div class="skill-row" data-order="7">
-        <div class="skill-icon"><i class="fa-solid fa-shield-halved"></i></div>
-        <div class="skill-text">Cyber Security</div>
-      </div>
-      <!-- 8 Mobile Security -->
-      <div class="skill-row" data-order="8">
-        <div class="skill-icon"><i class="fa-solid fa-lock"></i></div>
-        <div class="skill-text">Mobile Security</div>
-      </div>
-      <!-- 9 HTML -->
-      <div class="skill-row" data-order="9">
-        <div class="skill-icon"><i class="fa-brands fa-html5"></i></div>
-        <div class="skill-text">HTML</div>
-      </div>
-      <!-- 10 JSS -->
-      <div class="skill-row" data-order="10">
-        <div class="skill-icon"><i class="fa-brands fa-js"></i></div>
-        <div class="skill-text">JSS (JavaScript)</div>
-      </div>
-      <!-- 11 Ethical -->
-      <div class="skill-row" data-order="11">
-        <div class="skill-icon"><i class="fa-solid fa-user-secret"></i></div>
-        <div class="skill-text">Ethical Hacking</div>
-      </div>
-    </div>
-  </section>
-
-  <footer>This is the all about DEVIL</footer>
+<div class="subtitle">
+Injector • Root • VPhoneOS Premium
 </div>
 
-<!-- back to top -->
-<button id="toTop" class="top-btn" title="Back to top" aria-label="Back to top"><i class="fa fa-arrow-up"></i></button>
+<div class="features">
+⚡ Ultra Fast Injection<br>
+🛡 Anti Ban Protection<br>
+📱 Root Supported<br>
+🔥 VPhoneOS Premium Support<br>
+🚀 Smooth Gameplay
+</div>
+
+<div class="price-container">
+
+<div class="price-card">
+<h3>1 DAY</h3>
+<div class="price">₹50</div>
+</div>
+
+<div class="price-card">
+<h3>7 DAYS</h3>
+<div class="price">₹150</div>
+</div>
+
+<div class="price-card">
+<h3>30 DAYS</h3>
+<div class="price">₹400</div>
+</div>
+
+<div class="price-card">
+<h3>LIFETIME</h3>
+<div class="price">₹999</div>
+</div>
+
+</div>
+
+<br>
+
+<a href="https://t.me/+fzRDO3ib30s3N2Y9" class="btn telegram">
+Join Telegram
+</a>
+
+<a href="tg://openmessage?user_id=7695425512" class="btn buy">
+Buy Now
+</a>
+
+<div class="footer">
+© 2026 HELPER MODS TEAM
+</div>
+
+</div>
 
 <script>
-/* -------------- Behavior & features -------------- */
 
-(() => {
-  const isAndroid = /Android/i.test(navigator.userAgent);
-  // Improve intent behaviour: if Android, keep intent href; if not, open data-href
-  document.querySelectorAll('.social-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      // If not Android, open data-href normally; if Android, allow default (intent scheme)
-      const fallback = btn.getAttribute('data-href');
-      if (!isAndroid) {
-        e.preventDefault();
-        window.open(fallback, '_blank', 'noopener');
-      } else {
-        // On Android, allow intent:// link to try opening Chrome
-        // But also set a fallback after short timeout in case it fails (some devices)
-        const intentHref = btn.getAttribute('href');
-        // try location replace to intent (this usually launches Chrome)
-        // then fallback to fallback link after 1500ms
-        window.location = intentHref;
-        setTimeout(()=> { window.open(fallback, '_blank', 'noopener'); }, 1400);
-        e.preventDefault();
-      }
-    });
-  });
+/* MATRIX EFFECT */
 
-  // Copy email
-  document.getElementById('copyEmail').addEventListener('click', async () => {
-    const email = 'scamfor01@gmail.com';
-    try {
-      await navigator.clipboard.writeText(email);
-      alert('Email copied to clipboard: ' + email);
-    } catch (err) {
-      // fallback
-      const ta = document.createElement('textarea');
-      ta.value = email;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      ta.remove();
-      alert('Email copied to clipboard: ' + email);
-    }
-  });
+var canvas = document.getElementById("matrix");
+var ctx = canvas.getContext("2d");
 
-  // vCard download
-  document.getElementById('downloadVcard').addEventListener('click', () => {
-    // basic vCard
-    const vcard = [
-      'BEGIN:VCARD',
-      'VERSION:3.0',
-      'FN:DEVIL',
-      'N:;DEVIL;;;',
-      'EMAIL;TYPE=INTERNET: scamfor01@gmail.com',
-      'TEL;TYPE=CELL:REPLACE_WHATSAPP_NUMBER',
-      'NOTE:Coder • App Developer • Cybersecurity Enthusiast',
-      'END:VCARD'
-    ].join('\n');
-    const blob = new Blob([vcard], {type: 'text/vcard'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = 'DEVIL.vcf';
-    document.body.appendChild(a); a.click();
-    a.remove(); URL.revokeObjectURL(url);
-  });
+canvas.height = window.innerHeight;
+canvas.width = window.innerWidth;
 
-  // back to top
-  const toTop = document.getElementById('toTop');
-  toTop.addEventListener('click', () => window.scrollTo({top:0,behavior:'smooth'}));
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > 300) toTop.style.display = 'block';
-    else toTop.style.display = 'none';
-  });
-  toTop.style.display = 'none';
+var letters = "HELPERMODS0123456789";
+letters = letters.split("");
 
-  // Reveal skill rows in sequence using IntersectionObserver
-  const skillRows = Array.from(document.querySelectorAll('.skill-row'));
-  const skillObserver = new IntersectionObserver((entries, obs) => {
-    entries.forEach(en => {
-      if (en.isIntersecting) {
-        const el = en.target;
-        const order = Number(el.dataset.order || 0);
-        setTimeout(()=> el.classList.add('show'), order * 70);
-        obs.unobserve(el);
-      }
-    });
-  }, {threshold:0.12});
-  skillRows.forEach(s => skillObserver.observe(s));
+var fontSize = 14;
+var columns = canvas.width / fontSize;
 
-  // reveal 'panel' sections when scrolled
-  const sections = document.querySelectorAll('.panel, section');
-  const secObserver = new IntersectionObserver((entries, obs) => {
-    entries.forEach(en => {
-      if (en.isIntersecting) en.target.classList.add('show');
-    });
-  }, {threshold:0.12});
-  sections.forEach(s => secObserver.observe(s));
+var drops = [];
 
-  // Fix avatar image glitch: ensure placeholder shown until loaded (image tag already avoids layout shift).
-  const avatar = document.getElementById('avatarImg');
-  if (!avatar.complete) {
-    avatar.style.visibility = 'hidden';
-    avatar.addEventListener('load', () => avatar.style.visibility = 'visible');
-    avatar.addEventListener('error', () => avatar.style.visibility = 'visible');
-  }
+for(var x = 0; x < columns; x++)
+drops[x] = 1;
 
-  // Improve keyboard focus for about box
-  const aboutBox = document.getElementById('aboutBox');
-  aboutBox.addEventListener('keydown', (e) => {
-    // allow space to scroll within about box when focused
-    if (['Space','PageDown','PageUp'].includes(e.code)) e.stopPropagation();
-  });
+function draw(){
 
-  // Small accessibility: focus outline for keyboard users
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Tab') document.body.classList.add('show-focus');
-  });
+ctx.fillStyle = "rgba(0,0,0,0.05)";
+ctx.fillRect(0,0,canvas.width,canvas.height);
 
-  /* ---------- Matrix animation ---------- */
-  const canvas = document.getElementById('matrix');
-  const ctx = canvas.getContext('2d', {alpha:true});
+ctx.fillStyle = "#00ffcc";
+ctx.font = fontSize + "px monospace";
 
-  let W = canvas.width = innerWidth;
-  let H = canvas.height = innerHeight;
+for(var i = 0; i < drops.length; i++){
 
-  // performance: stop animation on small screens or low device pixel ratio
-  const shouldAnimate = !(window.innerWidth < 480 || window.devicePixelRatio > 3 === false && window.devicePixelRatio < 0.9);
+var text = letters[Math.floor(Math.random()*letters.length)];
 
-  let fontSize = 14;
-  let columns = Math.floor(W / fontSize);
-  let drops = new Array(columns).fill(1);
-  const letters = '01'; // simple binary matrix feel
+ctx.fillText(text,i*fontSize,drops[i]*fontSize);
 
-  function resizeCanvas(){
-    W = canvas.width = innerWidth;
-    H = canvas.height = innerHeight;
-    fontSize = Math.max(12, Math.floor(Math.min(18, innerWidth / 120)));
-    columns = Math.floor(W / fontSize);
-    drops = new Array(columns).fill(1);
-    ctx.font = fontSize + 'px monospace';
-  }
+if(drops[i]*fontSize > canvas.height && Math.random() > 0.975)
+drops[i] = 0;
 
-  // draw frame
-  let running = shouldAnimate;
-  function draw(){
-    if (!running) return;
-    ctx.fillStyle = 'rgba(0,0,0,0.12)';
-    ctx.fillRect(0,0,W,H);
-    ctx.fillStyle = 'rgba(0,255,90,0.9)';
-    ctx.font = fontSize + 'px monospace';
+drops[i]++;
 
-    for (let i=0;i<drops.length;i++){
-      const text = letters.charAt(Math.floor(Math.random()*letters.length));
-      ctx.fillText(text, i*fontSize, drops[i]*fontSize);
-      if (drops[i]*fontSize > H && Math.random() > 0.975) drops[i] = 0;
-      drops[i]++;
-    }
-  }
+}
 
-  let anim;
-  function startAnim(){
-    if (!running) return;
-    anim = setInterval(draw, 35);
-  }
-  function stopAnim(){
-    running = false; if (anim) clearInterval(anim);
-  }
+}
 
-  // start if ok
-  resizeCanvas();
-  if (shouldAnimate) startAnim();
+setInterval(draw,33);
 
-  // responsive
-  let resizeTimeout;
-  window.addEventListener('res
+</script>
+
+</body>
+</html>
