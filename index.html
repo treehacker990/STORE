@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Devil Image to .h Converter</title>
+<title>HELPER MODS Image to .h Converter</title>
 
 <style>
 body{
@@ -43,7 +43,7 @@ padding:10px;
 
 <body>
 
-<h1>DEVIL Image → Base64 → .H Downloader</h1>
+<h1>HELPER MODS Image → Base64 → .H Downloader</h1>
 
 <input type="file" id="imageInput">
 
@@ -76,10 +76,10 @@ reader.onload = function(e){
 let base64 = e.target.result;
 
 headerCode =
-`#ifndef DEVIL_IMAGE_H
-#define DEVIL_IMAGE_H
+`#ifndef HELPER_IMAGE_H
+#define HELPER_IMAGE_H
 
-const char* devil_image_base64 =
+const char* HELPER_image_base64 =
 "${base64}";
 
 #endif`;
@@ -105,7 +105,7 @@ const a = document.createElement("a");
 
 a.href = URL.createObjectURL(blob);
 
-a.download = "devil_image.h";
+a.download = "HELPER_image.h";
 
 a.click();
 
