@@ -1,25 +1,116 @@
 <!DOCTYPE html>
 <html>
-<body style="background:black;color:white;text-align:center">
+<head>
+<meta charset="UTF-8">
+<title>Devil Image to .h Converter</title>
 
-<h2>Devil Base64 Converter</h2>
+<style>
+body{
+background:#0a0a0a;
+color:#00ffcc;
+font-family:monospace;
+text-align:center;
+padding:40px;
+}
 
-<input type="file" id="imgInput">
+h1{
+color:#00ffcc;
+text-shadow:0 0 10px #00ffcc;
+}
 
-<p>Base64 Output:</p>
-<textarea id="output" style="width:90%;height:300px;"></textarea>
+button{
+padding:12px 25px;
+margin:10px;
+border:none;
+background:#00ffcc;
+color:#000;
+font-weight:bold;
+cursor:pointer;
+border-radius:6px;
+}
+
+textarea{
+width:90%;
+height:250px;
+margin-top:20px;
+background:#111;
+color:#00ffcc;
+border:1px solid #00ffcc;
+padding:10px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>DEVIL Image → Base64 → .H Downloader</h1>
+
+<input type="file" id="imageInput">
+
+<br>
+
+<button onclick="convertImage()">Convert</button>
+<button onclick="downloadHeader()">Download .h File</button>
+
+<br>
+
+<textarea id="output" placeholder="Base64 + Header code will appear here"></textarea>
 
 <script>
-document.getElementById("imgInput").addEventListener("change", function(){
-    const file = this.files[0];
-    const reader = new FileReader();
 
-    reader.onload = function(e){
-        document.getElementById("output").value = e.target.result;
-    }
+let headerCode = "";
 
-    reader.readAsDataURL(file);
-});
+function convertImage(){
+
+const file = document.getElementById("imageInput").files[0];
+
+if(!file){
+alert("Select Image First");
+return;
+}
+
+const reader = new FileReader();
+
+reader.onload = function(e){
+
+let base64 = e.target.result;
+
+headerCode =
+`#ifndef DEVIL_IMAGE_H
+#define DEVIL_IMAGE_H
+
+const char* devil_image_base64 =
+"${base64}";
+
+#endif`;
+
+document.getElementById("output").value = headerCode;
+
+};
+
+reader.readAsDataURL(file);
+
+}
+
+function downloadHeader(){
+
+if(headerCode===""){
+alert("Convert Image First");
+return;
+}
+
+const blob = new Blob([headerCode],{type:"text/plain"});
+
+const a = document.createElement("a");
+
+a.href = URL.createObjectURL(blob);
+
+a.download = "devil_image.h";
+
+a.click();
+
+}
+
 </script>
 
 </body>
