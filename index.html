@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>DEVIL ADVANCED LIB ENCRYPTOR</title>
+<title>DEVIL LIB & DEX ENCRYPTOR</title>
 
 <style>
 body{
@@ -37,44 +37,24 @@ color:#ff0033;
 
 <body>
 
-<h2>DEVIL ADVANCED LIB ENCRYPTOR 🔐</h2>
+<h2>DEVIL LIB / CLASSES.DEX ENCRYPTOR 🔐</h2>
 
 <input type="file" id="fileInput"><br>
 
-<input type="text" id="key" placeholder="Secret Key">
+<input type="text" id="key" placeholder="Enter Secret Key"><br>
 
-<button onclick="generateKey()">Generate Key</button>
-
-<br>
-
-<button onclick="encryptLib()">Encrypt LIB</button>
-<button onclick="decryptLib()">Decrypt LIB</button>
+<button onclick="encryptFile()">Encrypt File</button>
+<button onclick="decryptFile()">Decrypt File</button>
 
 <script>
 
-function generateKey(){
-
-let chars="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-let key="";
-
-for(let i=0;i<24;i++){
-
-key+=chars.charAt(Math.floor(Math.random()*chars.length));
-
-}
-
-document.getElementById("key").value=key;
-
-}
-
-function xorProcess(data,key){
+function processData(data,key){
 
 let result=new Uint8Array(data.length);
 
 for(let i=0;i<data.length;i++){
 
-result[i]=data[i]^key.charCodeAt(i%key.length)^(i*37);
+result[i]=data[i]^key.charCodeAt(i%key.length)^(i*41);
 
 }
 
@@ -82,19 +62,18 @@ return result;
 
 }
 
-function encryptLib(){
+function encryptFile(){
 
 let file=document.getElementById("fileInput").files[0];
-
 let key=document.getElementById("key").value;
 
 if(!file){
-alert("Upload LIB file first");
+alert("Upload LIB or classes.dex file");
 return;
 }
 
-if(key.length<8){
-alert("Key must be at least 8 characters");
+if(key.length<6){
+alert("Key must be at least 6 characters");
 return;
 }
 
@@ -104,7 +83,7 @@ reader.onload=function(e){
 
 let data=new Uint8Array(e.target.result);
 
-let encrypted=xorProcess(data,key);
+let encrypted=processData(data,key);
 
 let blob=new Blob([encrypted]);
 
@@ -112,7 +91,7 @@ let a=document.createElement("a");
 
 a.href=URL.createObjectURL(blob);
 
-a.download="devil_encrypted_lib.so";
+a.download="devil_encrypted_"+file.name;
 
 a.click();
 
@@ -122,14 +101,13 @@ reader.readAsArrayBuffer(file);
 
 }
 
-function decryptLib(){
+function decryptFile(){
 
 let file=document.getElementById("fileInput").files[0];
-
 let key=document.getElementById("key").value;
 
 if(!file){
-alert("Upload encrypted LIB");
+alert("Upload encrypted file");
 return;
 }
 
@@ -139,7 +117,7 @@ reader.onload=function(e){
 
 let data=new Uint8Array(e.target.result);
 
-let decrypted=xorProcess(data,key);
+let decrypted=processData(data,key);
 
 let blob=new Blob([decrypted]);
 
@@ -147,7 +125,7 @@ let a=document.createElement("a");
 
 a.href=URL.createObjectURL(blob);
 
-a.download="devil_decrypted_lib.so";
+a.download="devil_decrypted_"+file.name;
 
 a.click();
 
