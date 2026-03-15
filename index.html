@@ -2,7 +2,8 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>DEVIL APK ENCRYPT TOOL</title>
+<title>DEVIL LIB ENCRYPTOR</title>
+
 <style>
 body{
 background:#0f0f0f;
@@ -11,12 +12,14 @@ font-family:Arial;
 text-align:center;
 padding:40px;
 }
+
 input,button{
-margin:10px;
 padding:10px;
+margin:10px;
 border-radius:8px;
 border:none;
 }
+
 button{
 background:#ff0033;
 color:white;
@@ -24,70 +27,66 @@ font-weight:bold;
 cursor:pointer;
 }
 </style>
+
 </head>
 
 <body>
 
-<h2>DEVIL APK ENCRYPT TOOL 🔐</h2>
+<h2>DEVIL LIB ENCRYPTION TOOL 🔐</h2>
 
 <input type="file" id="fileInput"><br>
-<input type="text" id="key" placeholder="Secret Key"><br>
+<input type="text" id="key" placeholder="Enter Secret Key"><br>
 
-<button onclick="encryptFile()">Encrypt APK</button>
-<button onclick="decryptFile()">Decrypt APK</button>
+<button onclick="encryptLib()">Encrypt LIB</button>
 
 <script>
 
-function xor(data,key){
+function xorEncrypt(data,key){
 let result=new Uint8Array(data.length);
+
 for(let i=0;i<data.length;i++){
-result[i]=data[i]^key.charCodeAt(i%key.length)^(i*31);
+result[i]=data[i]^key.charCodeAt(i%key.length)^(i*17);
 }
+
 return result;
 }
 
-function encryptFile(){
+function encryptLib(){
+
 let file=document.getElementById("fileInput").files[0];
 let key=document.getElementById("key").value;
 
-let reader=new FileReader();
-
-reader.onload=function(e){
-
-let data=new Uint8Array(e.target.result);
-let enc=xor(data,key);
-
-let blob=new Blob([enc]);
-let a=document.createElement("a");
-a.href=URL.createObjectURL(blob);
-a.download="devil_encrypted.apk";
-a.click();
-
-};
-
-reader.readAsArrayBuffer(file);
+if(!file){
+alert("Upload lib file first");
+return;
 }
 
-function decryptFile(){
-let file=document.getElementById("fileInput").files[0];
-let key=document.getElementById("key").value;
+if(key.length<3){
+alert("Enter strong key");
+return;
+}
 
 let reader=new FileReader();
 
 reader.onload=function(e){
 
 let data=new Uint8Array(e.target.result);
-let dec=xor(data,key);
 
-let blob=new Blob([dec]);
+let encrypted=xorEncrypt(data,key);
+
+let blob=new Blob([encrypted]);
+
 let a=document.createElement("a");
 a.href=URL.createObjectURL(blob);
-a.download="devil_decrypted.apk";
+
+a.download="devil_encrypted_lib.so";
+
 a.click();
 
 };
 
 reader.readAsArrayBuffer(file);
+
 }
 
 </script>
