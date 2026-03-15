@@ -2,113 +2,92 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>HELPER MODS Image to .h Converter</title>
-
+<title>DEVIL APK ENCRYPT TOOL</title>
 <style>
 body{
-background:#0a0a0a;
-color:#00ffcc;
-font-family:monospace;
+background:#0f0f0f;
+color:white;
+font-family:Arial;
 text-align:center;
 padding:40px;
 }
-
-h1{
-color:#00ffcc;
-text-shadow:0 0 10px #00ffcc;
-}
-
-button{
-padding:12px 25px;
+input,button{
 margin:10px;
+padding:10px;
+border-radius:8px;
 border:none;
-background:#00ffcc;
-color:#000;
+}
+button{
+background:#ff0033;
+color:white;
 font-weight:bold;
 cursor:pointer;
-border-radius:6px;
-}
-
-textarea{
-width:90%;
-height:250px;
-margin-top:20px;
-background:#111;
-color:#00ffcc;
-border:1px solid #00ffcc;
-padding:10px;
 }
 </style>
 </head>
 
 <body>
 
-<h1>HELPER MODS Image → Base64 → .H Downloader</h1>
+<h2>DEVIL APK ENCRYPT TOOL 🔐</h2>
 
-<input type="file" id="imageInput">
+<input type="file" id="fileInput"><br>
+<input type="text" id="key" placeholder="Secret Key"><br>
 
-<br>
-
-<button onclick="convertImage()">Convert</button>
-<button onclick="downloadHeader()">Download .h File</button>
-
-<br>
-
-<textarea id="output" placeholder="Base64 + Header code will appear here"></textarea>
+<button onclick="encryptFile()">Encrypt APK</button>
+<button onclick="decryptFile()">Decrypt APK</button>
 
 <script>
 
-let headerCode = "";
-
-function convertImage(){
-
-const file = document.getElementById("imageInput").files[0];
-
-if(!file){
-alert("Select Image First");
-return;
+function xor(data,key){
+let result=new Uint8Array(data.length);
+for(let i=0;i<data.length;i++){
+result[i]=data[i]^key.charCodeAt(i%key.length)^(i*31);
+}
+return result;
 }
 
-const reader = new FileReader();
+function encryptFile(){
+let file=document.getElementById("fileInput").files[0];
+let key=document.getElementById("key").value;
 
-reader.onload = function(e){
+let reader=new FileReader();
 
-let base64 = e.target.result;
+reader.onload=function(e){
 
-headerCode =
-`#ifndef HELPER_IMAGE_H
-#define HELPER_IMAGE_H
+let data=new Uint8Array(e.target.result);
+let enc=xor(data,key);
 
-const char* HELPER_image_base64 =
-"${base64}";
-
-#endif`;
-
-document.getElementById("output").value = headerCode;
+let blob=new Blob([enc]);
+let a=document.createElement("a");
+a.href=URL.createObjectURL(blob);
+a.download="devil_encrypted.apk";
+a.click();
 
 };
 
-reader.readAsDataURL(file);
-
+reader.readAsArrayBuffer(file);
 }
 
-function downloadHeader(){
+function decryptFile(){
+let file=document.getElementById("fileInput").files[0];
+let key=document.getElementById("key").value;
 
-if(headerCode===""){
-alert("Convert Image First");
-return;
-}
+let reader=new FileReader();
 
-const blob = new Blob([headerCode],{type:"text/plain"});
+reader.onload=function(e){
 
-const a = document.createElement("a");
+let data=new Uint8Array(e.target.result);
+let dec=xor(data,key);
 
-a.href = URL.createObjectURL(blob);
-
-a.download = "HELPER_image.h";
-
+let blob=new Blob([dec]);
+let a=document.createElement("a");
+a.href=URL.createObjectURL(blob);
+a.download="devil_decrypted.apk";
 a.click();
 
+};
+
+reader.readAsArrayBuffer(file);
 }
 
 </script>
